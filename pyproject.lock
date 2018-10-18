@@ -1,0 +1,39 @@
+[[package]]
+category = "main"
+description = "An adapter to Linux kernel support for inotify directory-watching."
+name = "inotify"
+optional = false
+platform = "*"
+python-versions = "*"
+version = "0.2.10"
+
+[package.dependencies]
+nose = "*"
+
+[[package]]
+category = "main"
+description = "nose extends unittest to make testing easier"
+name = "nose"
+optional = false
+platform = "UNKNOWN"
+python-versions = "*"
+version = "1.3.7"
+
+[[package]]
+category = "main"
+description = "Python USB access module"
+name = "pyusb"
+optional = false
+platform = "*"
+python-versions = "*"
+version = "1.0.2"
+
+[metadata]
+content-hash = "b890028a479ca4988129b73808f48f9dc91941f369365fe3fe9d74c75dd5e515"
+platform = "*"
+python-versions = "*"
+
+[metadata.hashes]
+inotify = ["397f8785450e41f606fe4eb6f5e8e0a1c70b354b56495225fc6c6fe7e07db0c9", "974a623a338482b62e16d4eb705fb863ed33ec178680fc3e96ccdf0df6c02a07"]
+nose = ["9ff7c6cc443f8c51994b34a667bbcf45afd6d945be7477b52e97516fd17c53ac", "dadcddc0aefbf99eea214e0f1232b94f2fa9bd98fa8353711dacb112bfcbbb2a", "f1bffef9cbc82628f6e7d7b40d7e255aefaa1adb6a1b1d26c69a8b79e6208a98"]
+pyusb = ["4e9b72cc4a4205ca64fbf1f3fff39a335512166c151ad103e55c8223ac147362"]
