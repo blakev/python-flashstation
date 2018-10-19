@@ -1,0 +1,34 @@
+{
+    "version": 1,
+    "formatters": {
+        "full": {
+          "class":  "logging.Formatter",
+          "format": "%(asctime)s %(process)d %(thread)d %(levelname)-8s %(name)-20s %(message)s"
+        }
+    },
+    "handlers": {
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": "./output.log",
+            "mode": "w",
+            "formatter": "full",
+            "level": "DEBUG"
+        },
+        "stdout": {
+            "class": "logging.StreamHandler",
+            "formatter": "full",
+            "level": "DEBUG"
+        }
+    },
+    "root":
+    {
+        "level": "DEBUG",
+        "handlers": ["file", "stdout"]
+    },
+    "loggers": {
+        "flasher":  {
+            "handlers":  ["file", "stdout"],
+            "propagate":  0
+        }
+    }
+}

@@ -28,8 +28,26 @@ platform = "*"
 python-versions = "*"
 version = "1.0.2"
 
+[[package]]
+category = "main"
+description = "Python subprocess replacement"
+name = "sh"
+optional = false
+platform = "*"
+python-versions = "*"
+version = "1.12.14"
+
+[[package]]
+category = "main"
+description = "List processing tools and functional utilities"
+name = "toolz"
+optional = false
+platform = "*"
+python-versions = "*"
+version = "0.9.0"
+
 [metadata]
-content-hash = "b890028a479ca4988129b73808f48f9dc91941f369365fe3fe9d74c75dd5e515"
+content-hash = "7b620cd4b00e8a411af62e08596547628c036c880e4f6839b5b8ccc9692d2c1d"
 platform = "*"
 python-versions = "*"
 
@@ -37,3 +55,5 @@ python-versions = "*"
 inotify = ["397f8785450e41f606fe4eb6f5e8e0a1c70b354b56495225fc6c6fe7e07db0c9", "974a623a338482b62e16d4eb705fb863ed33ec178680fc3e96ccdf0df6c02a07"]
 nose = ["9ff7c6cc443f8c51994b34a667bbcf45afd6d945be7477b52e97516fd17c53ac", "dadcddc0aefbf99eea214e0f1232b94f2fa9bd98fa8353711dacb112bfcbbb2a", "f1bffef9cbc82628f6e7d7b40d7e255aefaa1adb6a1b1d26c69a8b79e6208a98"]
 pyusb = ["4e9b72cc4a4205ca64fbf1f3fff39a335512166c151ad103e55c8223ac147362"]
+sh = ["ae3258c5249493cebe73cb4e18253a41ed69262484bad36fdb3efcb8ad8870bb", "b52bf5833ed01c7b5c5fb73a7f71b3d98d48e9b9b8764236237bdc7ecae850fc"]
+toolz = ["929f0a7ea7f61c178bd951bdae93920515d3fbdbafc8e6caf82d752b9b3b31c9"]
