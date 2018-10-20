@@ -3,7 +3,7 @@
     "formatters": {
         "full": {
           "class":  "logging.Formatter",
-          "format": "%(asctime)s %(process)d %(thread)d %(levelname)-8s %(name)-20s %(message)s"
+          "format": "%(asctime)s %(process)d %(thread)d %(levelname)-8s %(name)-40s %(message)s"
         }
     },
     "handlers": {
