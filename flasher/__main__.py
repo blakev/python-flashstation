@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import logging
+from tempfile import gettempdir
 from logging import getLogger
 from logging.config import dictConfig
 
@@ -16,25 +17,30 @@ logger = getLogger('flasher')
 @click.command()
 @click.option(
     '-c', '--clone',
-    help='path to clone to the formatted usb',
+    help='Path to clone to the formatted USB. (multiple allowed)',
     type=click.Path(exists=True, file_okay=True, dir_okay=True, readable=True),
     multiple=True)
 @click.option(
+    '-x', '--exclude',
+    help='File extensions to exclude from cloning. (multiple allowed)',
+    type=str,
+    multiple=True)
+@click.option(
     '--label',
-    help='usb device label',
+    help='USB device label.',
     type=str,
     default='FlashStation')
 @click.option(
     '--tmp-mount',
-    help='path for temporarily mounting usb drives',
+    help='Path for temporarily mounting USB drives.',
     type=click.Path(exists=True, file_okay=False, dir_okay=True, writable=True),
-    default=r'/tmp')
+    default=gettempdir())
 @click.option(
     '-n', '--concurrent',
-    help='concurrent devices to operate on',
+    help='Concurrent devices to operate on.',
     default=1,
     type=click.IntRange(min=1))
-def main(clone, label, tmp_mount, concurrent):
+def main(clone, exclude, label, tmp_mount, concurrent):
     # yapf: enable
 
     # setup logging
@@ -45,12 +51,20 @@ def main(clone, label, tmp_mount, concurrent):
         getLogger('sh').setLevel(logging.ERROR)
 
     # ~~ setup
-    click.echo('WARNING! THIS APPLICATION MUST BE RUN AS ROOT.')
+    click.secho('WARNING! THIS APPLICATION MUST BE RUN AS ROOT.', fg='red')
     sudo = ensure_root()
     failure = False
 
+    # process the file extensions
+    exclude_ext = set()
+    for entry in exclude:
+        entry = entry.replace(',', ' ')
+        for ext in entry.split():
+            exclude_ext.add('.' + ext.strip('.'))
+    logger.info('excluding from clone, %s', exclude_ext)
+
     try:
-        process_loop(clone, label, tmp_mount, concurrent, sudo)
+        process_loop(clone, label, tmp_mount, concurrent, exclude_ext, sudo)
     except KeyboardInterrupt:
         click.echo('shutting down')
     except Exception as e:
