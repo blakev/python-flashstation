@@ -9,7 +9,7 @@ import usb.util
 from click import echo
 from toolz.functoolz import curry
 from inotify.adapters import Inotify
-from sh import ErrorReturnCode, sudo
+from sh import Command, ErrorReturnCode, sudo
 
 from flasher.constants import MASS_STORAGE, STORAGE_DEV_RE
 from flasher.callbacks import CallbackManager
@@ -63,7 +63,7 @@ def usb_storage_devices():
 def process_state(notify, last_events, orig_devices, cur_devices):
     """Analyze the environment given Inotify events and currently tracked devices."""
     new_devices = {}
-    for event in notify.event_gen(yield_nones=False, timeout_s=3):
+    for event in notify.event_gen(yield_nones=False, timeout_s=1.5):
         raw_event, types, path, file = event
         # skip devices that don't look like /dev/sda
         if not STORAGE_DEV_RE.match(file):
@@ -89,7 +89,7 @@ def process_state(notify, last_events, orig_devices, cur_devices):
     return new_devices
 
 
-def process_loop(clone, label, tmp_mount, concurrent, sudo):
+def process_loop(clone, label, tmp_mount, concurrent, exclude, sudo):
     """Drop into the iNotify loop continually scanning for new devices.
 
     Args:
@@ -97,7 +97,8 @@ def process_loop(clone, label, tmp_mount, concurrent, sudo):
         label: name to apply to the formatted drives.
         tmp_mount: mount folder for the formatted device to clone files to.
         concurrent (int): number of concurrent threads for writing.
-        password (str): sudo/root password (if we need it)
+        exclude (Set[str]): file extensions to ignore while cloning.
+        sudo (Command): sudo/root password (if we need it)
     """
     # what we want to do with each device
     data = {
@@ -105,6 +106,7 @@ def process_loop(clone, label, tmp_mount, concurrent, sudo):
         'label': label,
         'tmp_mount': tmp_mount,
         'concurrent': concurrent,
+        'exclude': exclude,
         'sudo': sudo
     }
 
@@ -122,10 +124,12 @@ def process_loop(clone, label, tmp_mount, concurrent, sudo):
         logger.debug('original device, %s', device)
 
     # track the Inotify events in a loop.
-    last_events = deque(list(), maxlen=5)
+    last_events = deque(list(), maxlen=6)
 
     # prime the state; curry
     get_state = process_state(notify, last_events, original_devices)
+
+    logger.info('ready')
 
     while True:
         new_devices = get_state(current_devices)

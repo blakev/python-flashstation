@@ -4,7 +4,8 @@ from queue import Queue, Empty as EmptyQueue
 from logging import getLogger
 from threading import Thread, Event, Lock
 
-from sh import Command, ErrorReturnCode, cp, df, grep, rm
+from sh import Command, ErrorReturnCode, df, grep, rm
+from toolz.itertoolz import concat
 
 from flasher.util import pipe
 
@@ -20,6 +21,7 @@ partprobe = Command('partprobe')
 mkdir = Command('mkdir').bake('-p')
 eject = Command('eject')
 md5sum = Command('md5sum')
+rsync = Command('rsync')
 
 
 def get_md5sum(path):
@@ -65,9 +67,12 @@ class CallbackManager:
         if paths:
             self._hashsums = {}
 
+        excluded = self._data['exclude']
+
         for path in paths:
             if os.path.isfile(path):
-                self._hashsums[path] = get_md5sum(path)
+                if os.path.splitext(path)[-1].lower() not in excluded:
+                    self._hashsums[path] = get_md5sum(path)
                 continue
             elif not os.path.isdir(path):
                 logger.warning('skipping %s, not file or directory', path)
@@ -75,7 +80,9 @@ class CallbackManager:
             for root, _, files in os.walk(path, followlinks=False):
                 for file in files:
                     file = os.path.join(root, file)
-                    if os.path.exists(file) and not os.path.islink(file):
+                    if os.path.exists(file) and \
+                            not os.path.islink(file) and \
+                            os.path.splitext(file)[-1].lower() not in excluded:
                         self._hashsums[file] = get_md5sum(file)
         logger.info('found %d files', len(self._hashsums))
         self._lock.release()
@@ -85,6 +92,7 @@ class CallbackManager:
             logger.warning('path does not exist')
             return False
 
+        excluded = self._data['exclude']
         inv_hashsums = {v: k for k, v in self._hashsums.items()}
 
         for root, _, files in os.walk(tmp_mount, followlinks=False):
@@ -92,13 +100,13 @@ class CallbackManager:
                 path = os.path.join(root, file)
                 if os.path.exists(path) and \
                         os.path.isfile(path) and \
-                        not os.path.islink(path):
+                        not os.path.islink(path) and \
+                        os.path.splitext(path)[-1].lower() not in excluded:
                     md5hash = get_md5sum(path)
                     if md5hash not in inv_hashsums:
                         logger.error('invalid hashsum for file, %s', path)
                         return False
                     del inv_hashsums[md5hash]
-
         if inv_hashsums:
             for md5hash, file in inv_hashsums.items():
                 logger.error('missing file %s (%s)', file, md5hash)
@@ -130,15 +138,26 @@ class CallbackManager:
         tmp_mount = os.path.join(self._data['tmp_mount'], hex(abs(hash(device))))
         sudo = self._data['sudo']  # type: Command
 
+        # yapf: disable
         # ~~
-        def do_umount():
-            log('looking for device mount %s', partition)
-            try:
-                grep(df('-h'), partition)
-            except ErrorReturnCode:
-                pass
-            else:
-                sudo.umount(partition)
+        def do_umount(max_attempts=5):
+            for attempt in range(max_attempts):
+                log('looking for device mount %s (%d/%d)',
+                    partition,
+                    attempt + 1,
+                    max_attempts)
+                time.sleep(0.75)
+                try:
+                    grep(df('-h'), partition)
+                except ErrorReturnCode:
+                    pass
+                else:
+                    try:
+                        sudo.umount(partition)
+                    except ErrorReturnCode:
+                        time.sleep(0.5)
+                    else:
+                        return
 
         do_umount()
 
@@ -159,11 +178,11 @@ class CallbackManager:
         sudo.fdisk(device, _in=pipe(flow))
         sync()
 
+        do_umount()
+        time.sleep(1.0)
+
         log('creating new filesystem')
         sudo.partprobe(device)
-
-        do_umount()
-        time.sleep(2.0)
 
         sudo.mkfs(
             '--type=ext4',
@@ -180,7 +199,20 @@ class CallbackManager:
         mkdir(tmp_mount)
         sudo.mount(partition, tmp_mount)
         for path in self._data['clone']:
-            sudo.cp('-r', path, tmp_mount)
+            sudo.rsync(
+                '--verbose',
+                '--archive',
+                '--copy-links',
+                '--keep-dirlinks',
+                '--checksum',
+                '--whole-file',
+                '--no-perms',
+                '--no-owner',
+                '--no-group',
+                '--omit-dir-times',
+                *list(concat([('--exclude', '*%s' % ext) for ext in self._data['exclude']])),
+                path,
+                tmp_mount)
         sync()
 
         success = self.validate_hashes(tmp_mount)
@@ -188,11 +220,13 @@ class CallbackManager:
         if not success:
             self.on_unsuccessful_copy(device_id, device_path)
 
+        # yapf: enable
         log('cleaning up')
         sudo.umount(partition)
         sudo.rm('-rf', tmp_mount)
         sudo.eject(device)
         log('done')
+
 
     def on_new_device(self, device_id, device_path):
         self._queue.put((
