@@ -148,7 +148,6 @@ class CallbackManager:
             except ErrorReturnCode as e:
                 logger.error(e)
             self._queue.task_done()
-        logger.info('stopping thread')
 
     def _process(self, device_id, device_path):
         """Pipeline to format/prepare the usb device."""

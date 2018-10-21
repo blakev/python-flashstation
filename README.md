@@ -35,27 +35,35 @@ Options:
 
 WARNING! THIS APPLICATION MUST BE RUN AS ROOT.
 
-2018-10-20 19:16:11 INFO  flasher                     excluding from clone, {'.jpg'}
-2018-10-20 19:16:11 INFO  flasher.callbacks           starting thread Thread-0
-2018-10-20 19:16:11 INFO  flasher.callbacks           starting thread Thread-1
-2018-10-20 19:16:11 DEBUG flasher.process             original device, (5451, 64005, 2, 22)
-2018-10-20 19:16:11 INFO  flasher.process             ready
-2018-10-20 19:16:25 INFO  flasher.process             found new device (5451, 64005, 4, 23) at /dev/sdi
-2018-10-20 19:16:25 INFO  flasher.callbacks           starting process on (5451, 64005, 4, 23) at /dev/sdi
-2018-10-20 19:16:25 INFO  flasher.callbacks./dev/sdi  looking for device mount /dev/sdi1 (1/3)
-2018-10-20 19:16:26 INFO  flasher.callbacks./dev/sdi  looking for device mount /dev/sdi1 (2/3)
-2018-10-20 19:16:27 INFO  flasher.callbacks./dev/sdi  scrubbing partition table
-2018-10-20 19:16:28 INFO  flasher.callbacks./dev/sdi  creating partition table
-2018-10-20 19:16:28 INFO  flasher.callbacks./dev/sdi  looking for device mount /dev/sdi1 (1/3)
-2018-10-20 19:16:29 INFO  flasher.callbacks./dev/sdi  looking for device mount /dev/sdi1 (2/3)
-2018-10-20 19:16:30 INFO  flasher.callbacks./dev/sdi  looking for device mount /dev/sdi1 (3/3)
-2018-10-20 19:16:32 INFO  flasher.callbacks./dev/sdi  creating new filesystem
-2018-10-20 19:16:49 INFO  flasher.callbacks           scanning clone directories for hashsum
-2018-10-20 19:16:49 INFO  flasher.callbacks           found 53 files
-2018-10-20 19:16:49 INFO  flasher.callbacks./dev/sdi  copying contents from directories
-2018-10-20 19:16:54 INFO  flasher.callbacks./dev/sdi  validation success? True
-2018-10-20 19:16:54 INFO  flasher.callbacks./dev/sdi  cleaning up
-2018-10-20 19:16:55 INFO  flasher.callbacks./dev/sdi  done
+2018-10-21 15:56:32 INFO  flasher                     excluding from clone, {'.jpg'}
+2018-10-21 15:56:32 INFO  flasher.callbacks           starting thread Thread-0
+2018-10-21 15:56:32 INFO  flasher.callbacks           starting thread Thread-1
+2018-10-21 15:56:32 DEBUG flasher.process             original device, (2316, 4096, 4, 18)
+2018-10-21 15:56:32 INFO  flasher.process             ~ready
+2018-10-21 15:56:46 INFO  flasher.process             found new device (2352, 25925, 2, 19) at /dev/sda
+2018-10-21 15:56:46 INFO  flasher.callbacks           starting process on (2352, 25925, 2, 19) at /dev/sda
+2018-10-21 15:56:46 INFO  flasher.callbacks./dev/sda  looking for device mount /dev/sda1 (1/5)
+2018-10-21 15:56:47 INFO  flasher.callbacks./dev/sda  looking for device mount /dev/sda1 (2/5)
+2018-10-21 15:56:48 INFO  flasher.callbacks./dev/sda  scrubbing partition table
+2018-10-21 15:56:48 INFO  flasher.callbacks./dev/sda  creating partition table
+2018-10-21 15:56:49 INFO  flasher.callbacks./dev/sda  looking for device mount /dev/sda1 (1/5)
+2018-10-21 15:56:49 INFO  flasher.callbacks./dev/sda  looking for device mount /dev/sda1 (2/5)
+2018-10-21 15:56:50 INFO  flasher.callbacks./dev/sda  looking for device mount /dev/sda1 (3/5)
+2018-10-21 15:56:51 INFO  flasher.callbacks./dev/sda  looking for device mount /dev/sda1 (4/5)
+2018-10-21 15:56:52 INFO  flasher.callbacks./dev/sda  looking for device mount /dev/sda1 (5/5)
+2018-10-21 15:56:53 INFO  flasher.callbacks./dev/sda  creating new filesystem
+2018-10-21 15:57:04 INFO  flasher.callbacks           scanning clone directories for hashsum
+2018-10-21 15:57:04 INFO  flasher.callbacks           found 53 files
+2018-10-21 15:57:04 INFO  flasher.callbacks./dev/sda  copying contents from directories
+2018-10-21 15:57:12 INFO  flasher.callbacks./dev/sda  validation success? True
+2018-10-21 15:57:12 INFO  flasher.callbacks./dev/sda  cleaning up
+2018-10-21 15:57:13 INFO  flasher.callbacks./dev/sda  done
+2018-10-21 15:57:13 INFO  flasher.callbacks           device copy success
+^C
+2018-10-21 15:57:17 INFO  flasher.callbacks           clearing thread fun flag
+2018-10-21 15:57:17 INFO  flasher.callbacks           stoping thread Thread-0
+2018-10-21 15:57:18 INFO  flasher.callbacks           stoping thread Thread-1
+shutting down
 ```
 
 ### Attribution
