@@ -1,0 +1,13 @@
+[Unit]
+Description=USB stick flashing station.
+After=network.target
+
+[Service]
+Type=simple
+User={{ USER }}
+WorkingDirectory={{ CWD }}
+ExecStart={{ CMDLINE }}
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
