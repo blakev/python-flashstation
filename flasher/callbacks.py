@@ -1,31 +1,39 @@
 import os
+import sys
 import time
 from queue import Queue, Empty as EmptyQueue
 from logging import getLogger
 from threading import Thread, Event, Lock
 
-from sh import Command, ErrorReturnCode, df, grep, rm
+from click import secho
 from toolz.itertoolz import concat
+from sh import Command, CommandNotFound, ErrorReturnCode, df, grep, rm
 
 from flasher.util import pipe
 
 logger = getLogger(__name__)
 
-dd = Command('dd')
-mkfs = Command('mkfs')
-mount = Command('mount')
-umount = Command('umount')
-fdisk = Command('fdisk')
-sync = Command('sync')
-partprobe = Command('partprobe')
-mkdir = Command('mkdir').bake('-p')
-eject = Command('eject')
-md5sum = Command('md5sum')
-rsync = Command('rsync')
+try:
+    dd = Command('dd')
+    mkfs = Command('mkfs')
+    mount = Command('mount')
+    umount = Command('umount')
+    fdisk = Command('fdisk')
+    sync = Command('sync')
+    partprobe = Command('partprobe')
+    mkdir = Command('mkdir').bake('-p')
+    eject = Command('eject')
+    sha1sum = Command('sha1sum')
+    rsync = Command('rsync')
+except CommandNotFound as e:
+    msg = 'command line tool not found, %s' % str(e)
+    secho(msg, fg='green')
+    logger.error(msg)
+    sys.exit(1)
 
 
-def get_md5sum(path):
-    return md5sum(path).split()[0].strip()
+def get_sha1sum(path):
+    return sha1sum(path).split()[0].strip()
 
 
 class CallbackManager:
@@ -72,7 +80,7 @@ class CallbackManager:
         for path in paths:
             if os.path.isfile(path):
                 if os.path.splitext(path)[-1].lower() not in excluded:
-                    self._hashsums[path] = get_md5sum(path)
+                    self._hashsums[path] = get_sha1sum(path)
                 continue
             elif not os.path.isdir(path):
                 logger.warning('skipping %s, not file or directory', path)
@@ -83,7 +91,7 @@ class CallbackManager:
                     if os.path.exists(file) and \
                             not os.path.islink(file) and \
                             os.path.splitext(file)[-1].lower() not in excluded:
-                        self._hashsums[file] = get_md5sum(file)
+                        self._hashsums[file] = get_sha1sum(file)
         logger.info('found %d files', len(self._hashsums))
         self._lock.release()
 
@@ -102,14 +110,14 @@ class CallbackManager:
                         os.path.isfile(path) and \
                         not os.path.islink(path) and \
                         os.path.splitext(path)[-1].lower() not in excluded:
-                    md5hash = get_md5sum(path)
-                    if md5hash not in inv_hashsums:
+                    sha1hash = get_sha1sum(path)
+                    if sha1hash not in inv_hashsums:
                         logger.error('invalid hashsum for file, %s', path)
                         return False
-                    del inv_hashsums[md5hash]
+                    del inv_hashsums[sha1hash]
         if inv_hashsums:
-            for md5hash, file in inv_hashsums.items():
-                logger.error('missing file %s (%s)', file, md5hash)
+            for sha1hash, file in inv_hashsums.items():
+                logger.error('missing file %s (%s)', file, sha1hash)
             return False
         return True
 
@@ -210,7 +218,8 @@ class CallbackManager:
                 '--no-owner',
                 '--no-group',
                 '--omit-dir-times',
-                *list(concat([('--exclude', '*%s' % ext) for ext in self._data['exclude']])),
+                *list(concat([
+                    ('--exclude', '*%s' % ext) for ext in self._data['exclude']])),
                 path,
                 tmp_mount)
         sync()
@@ -227,6 +236,8 @@ class CallbackManager:
         sudo.eject(device)
         log('done')
 
+        if success:
+            self.on_successful_copy(device_id, device_path)
 
     def on_new_device(self, device_id, device_path):
         self._queue.put((
@@ -236,6 +247,9 @@ class CallbackManager:
 
     def on_removed_device(self, device, mount):
         logger.info('device removed %s %s', device, mount)
+
+    def on_successful_copy(self, device, mount):
+        logger.info('device copy success')
 
     def on_unsuccessful_copy(self, device, mount):
         logger.info('device copy failed')

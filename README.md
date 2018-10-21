@@ -6,7 +6,7 @@ USB stick flash/duplication station.
 
 Running as a background daemon python-flashstation scans for newly inserted mass storage.
 All new devices are automatically purged and reformatted before cloning file and folder contents.
-Copied files are validated by rsync-checksum as well as additional md5sum. Finalized devices
+Copied files are validated by rsync-checksum as well as additional SHA1 checksum. Finalized devices
 can be safely removed.
 
 

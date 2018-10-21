@@ -129,7 +129,7 @@ def process_loop(clone, label, tmp_mount, concurrent, exclude, sudo):
     # prime the state; curry
     get_state = process_state(notify, last_events, original_devices)
 
-    logger.info('ready')
+    logger.info('~ready')
 
     while True:
         new_devices = get_state(current_devices)

@@ -51,7 +51,7 @@ def main(clone, exclude, label, tmp_mount, concurrent):
         getLogger('sh').setLevel(logging.ERROR)
 
     # ~~ setup
-    click.secho('WARNING! THIS APPLICATION MUST BE RUN AS ROOT.', fg='red')
+    click.secho('WARNING! THIS APPLICATION MUST BE RUN AS ROOT.', fg='green')
     sudo = ensure_root()
     failure = False
 
@@ -66,7 +66,9 @@ def main(clone, exclude, label, tmp_mount, concurrent):
     try:
         process_loop(clone, label, tmp_mount, concurrent, exclude_ext, sudo)
     except KeyboardInterrupt:
-        click.echo('shutting down')
+        msg = 'shutting down'
+        logger.info(msg)
+        click.echo(msg)
     except Exception as e:
         failure = True
         logger.exception(e)
