@@ -67,8 +67,7 @@ def main(clone, exclude, label, tmp_mount, concurrent):
         process_loop(clone, label, tmp_mount, concurrent, exclude_ext, sudo)
     except KeyboardInterrupt:
         msg = 'shutting down'
-        logger.info(msg)
-        click.echo(msg)
+        click.secho(msg, fg='green')
     except Exception as e:
         failure = True
         logger.exception(e)

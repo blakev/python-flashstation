@@ -42,6 +42,10 @@ class CallbackManager:
         self._queue = Queue()
         self._running = Event()
         self._running.set()
+        self._threads = []
+
+        # temporary mount points to clean up
+        self._tmp_mounts = []
 
         # checksum validation
         self._lock = Lock()
@@ -54,10 +58,18 @@ class CallbackManager:
             t.daemon = True
             t.start()
             logger.info('starting thread %s', name)
+            self._threads.append(t)
 
     def stop(self):
         logger.info('clearing thread fun flag')
         self._running.clear()
+        for path in self._tmp_mounts:
+            if os.path.exists(path):
+                logger.info('removing stale tmp mount point, %s', path)
+                self._data['sudo'].rm('-rf', path)
+        for t in self._threads:
+            logger.info('stoping thread %s', t.name)
+            t.join(timeout=5.0)
 
     def scan_clone_dirs(self):
         logger.info('scanning clone directories for hashsum')
@@ -145,6 +157,9 @@ class CallbackManager:
         partition = '%s1' % device
         tmp_mount = os.path.join(self._data['tmp_mount'], hex(abs(hash(device))))
         sudo = self._data['sudo']  # type: Command
+
+        # possible cleanup later
+        self._tmp_mounts.append(tmp_mount)
 
         # yapf: disable
         # ~~

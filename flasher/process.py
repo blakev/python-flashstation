@@ -131,23 +131,30 @@ def process_loop(clone, label, tmp_mount, concurrent, exclude, sudo):
 
     logger.info('~ready')
 
-    while True:
-        new_devices = get_state(current_devices)
+    try:
+        while True:
+            new_devices = get_state(current_devices)
 
-        if new_devices:
-            # device was added
-            for device, mount in new_devices.items():
-                logger.info('found new device %s at %s', device, mount)
-                current_devices[device] = mount
-                manager.on_new_device(device, mount)
-            continue
+            if new_devices:
+                # device was added
+                for device, mount in new_devices.items():
+                    logger.info('found new device %s at %s', device, mount)
+                    current_devices[device] = mount
+                    manager.on_new_device(device, mount)
+                continue
 
-        current_usb = usb_storage_devices()
+            current_usb = usb_storage_devices()
 
-        for device in list(current_devices.keys()):
-            if device not in current_usb:
-                # device was removed
-                mount = current_devices.pop(device)
-                logger.info('device was removed %s from %s', device, mount)
-                manager.on_removed_device(device, mount)
-    # infinite loop
+            for device in list(current_devices.keys()):
+                if device not in current_usb:
+                    # device was removed
+                    mount = current_devices.pop(device)
+                    logger.info('device was removed %s from %s', device, mount)
+                    manager.on_removed_device(device, mount)
+        # infinite loop
+    except KeyboardInterrupt:
+        manager.stop()
+        raise
+    except Exception as e:
+        logger.error(e)
+        raise
