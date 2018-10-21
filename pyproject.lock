@@ -9,6 +9,15 @@ version = "7.0"
 
 [[package]]
 category = "main"
+description = "Cross-platform colored terminal text."
+name = "colorama"
+optional = false
+platform = "*"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "0.4.0"
+
+[[package]]
+category = "main"
 description = "An adapter to Linux kernel support for inotify directory-watching."
 name = "inotify"
 optional = false
@@ -56,12 +65,13 @@ python-versions = "*"
 version = "0.9.0"
 
 [metadata]
-content-hash = "12bfb9c4b4e14cc1b64e3b6261e52a2de048803cc0355d9071d79535eea5f47e"
+content-hash = "93d6f053c6cc655b6ed934398865db9c5f4cac6b26e9d477b8b8d32c55d346b2"
 platform = "*"
 python-versions = "*"
 
 [metadata.hashes]
 click = ["2335065e6395b9e67ca716de5f7526736bfa6ceead690adf616d925bdc622b13", "5b94b49521f6456670fdb30cd82a4eca9412788a93fa6dd6df72c94d5a8ff2d7"]
+colorama = ["a3d89af5db9e9806a779a50296b5fdb466e281147c2c235e8225ecc6dbf7bbf3", "c9b54bebe91a6a803e0772c8561d53f2926bfeb17cd141fbabcb08424086595c"]
 inotify = ["397f8785450e41f606fe4eb6f5e8e0a1c70b354b56495225fc6c6fe7e07db0c9", "974a623a338482b62e16d4eb705fb863ed33ec178680fc3e96ccdf0df6c02a07"]
 nose = ["9ff7c6cc443f8c51994b34a667bbcf45afd6d945be7477b52e97516fd17c53ac", "dadcddc0aefbf99eea214e0f1232b94f2fa9bd98fa8353711dacb112bfcbbb2a", "f1bffef9cbc82628f6e7d7b40d7e255aefaa1adb6a1b1d26c69a8b79e6208a98"]
 pyusb = ["4e9b72cc4a4205ca64fbf1f3fff39a335512166c151ad103e55c8223ac147362"]

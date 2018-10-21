@@ -12,5 +12,6 @@ pyusb = "^1.0"
 toolz = "^0.9.0"
 sh = "^1.12"
 click = "^7.0"
+colorama = "^0.4.0"
 
 [tool.poetry.dev-dependencies]
